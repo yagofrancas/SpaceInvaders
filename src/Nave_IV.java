@@ -79,7 +79,7 @@ public class Nave_IV {
         }
 
         if (indicesUsados.isEmpty()) {
-            System.out.println("Nenhum módulo foi gasto ainda para ser restaurado. Macaco");
+            System.out.println("Nenhum módulo foi gasto ainda para ser restaurado.");
             return;
         }
 

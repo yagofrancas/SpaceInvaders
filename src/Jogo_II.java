@@ -137,6 +137,7 @@ public class Jogo_II {
 
     private void exibirRelatorioFinal(CampoBatalha_III campo) {
         System.out.println("\n--- Relatório Final ---");
+        System.out.println("Status da Partida: " + (campo.isVitoria() ? "VITÓRIA" : "DERROTA"));
         System.out.println("Quantidade total de invasores eliminados: " + campo.getNave().getInimigosEliminados());
 
         if (estatisticasAlgoritmos.isEmpty()) {

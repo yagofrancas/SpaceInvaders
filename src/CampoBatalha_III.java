@@ -10,6 +10,7 @@ public class CampoBatalha_III {
     // Sistema de rodadas para condição de vitória
     private int rodadaAtual;
     private final int rodadasParaVencer;
+    private boolean vitoria; // Armazena se o jogador venceu ou perdeu
     // Sistema de aleatoriedade real para power-ups:
     // Após um power-up surgir, há um cooldown mínimo de rodadas antes do próximo.
     // Depois do cooldown, a probabilidade vai crescendo a cada rodada até estourar.
@@ -35,6 +36,7 @@ public class CampoBatalha_III {
         }
 
         this.rodadasDesdeUltimoPowerUp = 0;
+        this.vitoria = false;
 
         System.out.println(ANSI_Negrito + "Alerta do Setor /!/ : Inimigos se aproximando em sua direção!! " + ANSI_Reset);
         System.out.println("Objetivo: Sobreviva " + rodadasParaVencer + " rodadas para vencer!");
@@ -56,6 +58,10 @@ public class CampoBatalha_III {
         return rodadasParaVencer;
     }
 
+    public boolean isVitoria() {
+        return vitoria;
+    }
+
     public void setMatriz(int[][] matriz) {
         this.matriz = matriz;
     }
@@ -67,6 +73,7 @@ public class CampoBatalha_III {
     public int contarInvasores() {
         return contarInimigosRecursivo(0, 0);
     }
+
 
     private int contarInimigosRecursivo(int linha, int coluna) {
 
@@ -94,7 +101,7 @@ public class CampoBatalha_III {
         String ANSI_Laranja = "\u001B[33m";
         String ANSI_Roxo = "\u001B[35m";
 
-        System.out.println("--- Campo de Batalha ---  |  Rodada: " + rodadaAtual + "/" + rodadasParaVencer + "  |  Eliminados: " + naveIV.getInimigosEliminados());
+        System.out.println("--- Campo de Batalha ---  |  Rodada: " + rodadaAtual + "/" + rodadasParaVencer + "  |  Ativos: " + contarInvasores() + "  |  Eliminados: " + naveIV.getInimigosEliminados());
         System.out.println("Legenda: Números = Inimigos (vida) | " + ANSI_Roxo + "[\u2605]" + ANSI_Reset + " = Power-Up (ataque para coletar!) | 0 = Vazio");
         System.out.println();
         for (int i = 0; i < matriz.length; i++) {
@@ -244,11 +251,20 @@ public class CampoBatalha_III {
 
     //Aqui é onde os inimigos vão se movendo pela matriz e lógico, avançando rodadas.
     public boolean avancarRodada() {
+        // CHECAGEM DE VITÓRIA: se todos os invasores foram eliminados (somente após o jogo ter iniciado)
+        if (rodadaAtual > 0 && contarInvasores() == 0) {
+            System.out.println(ANSI_Negrito + "\n=== VITÓRIA ABSOLUTA! ===" + ANSI_Reset);
+            System.out.println("Todos os invasores foram completamente eliminados do setor!");
+            this.vitoria = true;
+            return false; // Termina o jogo
+        }
+
         // 1. CHECAGEM GLOBAL DE DERROTA INICIAL: se qualquer inimigo ja esta na coluna 0 antes do avanco, derrota imediata
         for (int i = 0; i < matriz.length; i++) {
             if (matriz[i][0] >= 1) {
                 System.out.println("Derrota! O inimigo superou as defesas da sua base!");
-                System.out.println(ANSI_Negrito + "Perdemos um Chefe de Esquadrão e de Familia. Seu Inutil!" + ANSI_Reset);
+                System.out.println(ANSI_Negrito + "Nossas linhas de defesa caíram. O setor foi perdido!" + ANSI_Reset);
+                this.vitoria = false;
                 return false;
             }
         }
@@ -304,16 +320,19 @@ public class CampoBatalha_III {
         for (int i = 0; i < matriz.length; i++) {
             if (matriz[i][0] >= 1) {
                 System.out.println("Derrota! O inimigo superou as defesas da sua base!");
-                System.out.println(ANSI_Negrito + "Perdemos um Chefe de Esquadrão e de Familia. Seu Inutil!" + ANSI_Reset);
+                System.out.println(ANSI_Negrito + "Nossas linhas de defesa caíram. O setor foi perdido!" + ANSI_Reset);
+                this.vitoria = false;
                 return false;
             }
         }
+
 
         // Condição de Vitória: o jogador sobreviveu o número de rodadas necessário!
         if (rodadaAtual >= rodadasParaVencer) {
             System.out.println(ANSI_Negrito + "\n=== GRANDE VITÓRIA! ==="  + ANSI_Reset);
             System.out.println("Você sobreviveu todas as " + rodadasParaVencer + " rodadas!");
-            System.out.println(ANSI_Negrito + "Agora suas filhas terão as panquecas que vc prometeu e sua esposa uma Bela Noite" + ANSI_Reset);
+            System.out.println(ANSI_Negrito + "A humanidade está salva graças às suas táticas de defesa!" + ANSI_Reset);
+            this.vitoria = true;
             return false;
         }
 
